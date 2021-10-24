@@ -16,7 +16,7 @@ class LSTM:
         self.out_vocab_size = out_vocab_size
         self.concate_len = hidden_dims + embedding_dims
 
-        self.Ww = initialize(self.embedding_dims, self.vocab_size)
+        self.Ww = initialize(self.vocab_size, self.embedding_dims)
         for gate in [self.Wg, self.Wi, self.Wf, self.Wo]:
             gate = initialize(self.hidden_dims, self.concate_len)
         self.Wv = initialize(self.out_vocab_size, self.hidden_dims)
@@ -34,7 +34,7 @@ class LSTM:
         self.deltabw = np.zeros((self.embedding_dims))
         for gate in [self.deltabg, self.deltabi, self.deltabf, self.daltabo]:
             gate = np.zeros((self.hidden_dims))
-        self.deltabv = np.zeros((self.out_vocab_size)
+        self.deltabv = np.zeros((self.out_vocab_size))
 
     def apply_delta(self, lr):
 
@@ -54,26 +54,23 @@ class LSTM:
 
     def predict(self,x):
 
-        g_gate = np.zeros((len(x) + 1, self.hidden_dims+self.embedding_dims))
-        i_gate = np.zeros((len(x), self.hidden_dims+self.x_dim))
-        f_gate = np.zeros((len(x), self.hidden_dims+self.x_dim))
-        o_gate = np.zeros((len(x), self.hidden_dims+self.x_dim))
-        s = np.zeros((len(x) + 1, self.hidden_dims))
-        ct = np.zeros((len(x) + 1, self.hidden_dims))
-        y = np.zeros((len(x) + 1, self.hidden_dims))
+        for gate in [g_gate, i_gate, f_gate, o_gate]:
+            gate = np.zeros(len(x), self.concate_len)
 
-        for t in range(len(x)):
-            g_gate[t] = np.tanh(np.dot(self.Wg, s[t-1].T))
-            i_gate[t] = sigmoid(np.dot(self.Wi, s[t-1].T))
-            f_gate[t] = sigmoid(np.dot(self.Wf, s[t-1].T))
-            o_gate[t] = sigmoid(np.dot(self.Wi, s[t-1].T))
+        state = np.zeros((len(x) + 1, self.concate_len))
+        out = np.zeros((len(x) + 1, self.hidden_dims))
+        y = np.zeros((len(x), self.out_vocab_size))
 
-            ct[t] = f_gate[
-
-    def calculate_gradient(self,x
+        word_embeddings = np.dot(x, Ww) # x -> (timestep, vocab_size) word_embeddings -> (embedding_dim, time_step)
+        for t in range(len(word_embeddings)):
+            z = np.concatenate(state[t-1], word_embeddings[t])
+            g_gate[t] = np.tanh(self.W
 
 
-    def calculate_loss(self,
+    def calculate_gradient(self,x)
 
 
-    def train(self,
+    def calculate_loss(self)
+
+
+    def train(self)
